@@ -33,14 +33,14 @@ def compressed_image_msg_to_image_instance(msg : CompressedImage, instance_index
         timestamp = time_to_timestamp(msg.header.stamp)
     else:
         timestamp = timestamp
-    return ImageInstance(data=bridge.compressed_imgmsg_to_cv2(msg), metadata=BaseMetadata(timestamp=timestamp, index=instance_index))
+    return ImageInstance(data=bridge.compressed_imgmsg_to_cv2(msg, desired_encoding="bgr8"), metadata=BaseMetadata(timestamp=timestamp, index=instance_index))
 
 def image_msg_to_image_instance(msg : Image, instance_index : int = -1, timestamp : Time = Time(seconds=0, nanoseconds=0), use_header=False) -> ImageInstance:
     if use_header:
         timestamp = time_to_timestamp(msg.header.stamp)
     else:
         timestamp = timestamp
-    return ImageInstance(data=bridge.imgmsg_to_cv2(msg), metadata=BaseMetadata(timestamp=timestamp, index=instance_index))
+    return ImageInstance(data=bridge.imgmsg_to_cv2(msg, desired_encoding="bgr8"), metadata=BaseMetadata(timestamp=timestamp, index=instance_index))
 
 ### IMAGE INSTANCE -> IMAGE MESSAGE ###
 
