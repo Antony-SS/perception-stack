@@ -2,7 +2,7 @@
 from ..core import DataStream
 from data_models.core.base_model import BaseModel
 from data_models.core.base_metadata import BaseMetadata
-from ros_message_conversions.ros2.time_funcs import time_to_timestamp, timestamp_to_time
+from ros_python_conversions.ros2.time import time_to_timestamp
 
 from rosbags.rosbag2 import Reader
 from rosbags.typesys import Stores, get_typestore, get_types_from_msg
@@ -122,7 +122,7 @@ class Ros2DataStream(DataStream):
 
         return conn, message, ts
 
-def make_ros2_mcap_data_stream(ros2_mcap_path : str,
+def make_ros2_data_stream(ros2_mcap_path : str,
                                loaded_mcap : Optional[Reader],
                                topic : str,
                                decode_fn : Callable[[Any, int, float], BaseModel],
