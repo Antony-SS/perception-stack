@@ -45,7 +45,7 @@ class DataStream(BaseModel):
 
         Yields
         -------
-        BaseDataModel
+        BaseModel
             Sequential instances from the data stream.
 
         Notes
@@ -58,7 +58,7 @@ class DataStream(BaseModel):
         )
     
     def get_instance(self, index : int) -> BaseModel:
-        """Get a BaseDataModel from the data stream at the specified index.
+        """Get a BaseModel from the data stream at the specified index.
 
         Parameters
         ----------
@@ -67,7 +67,7 @@ class DataStream(BaseModel):
 
         Returns
         -------
-        BaseDataModel
+        BaseModel
             The instance at the specified index.
 
         Notes
@@ -177,7 +177,7 @@ class DataStream(BaseModel):
         index = self._find_nearest_timestamp_index(timestamp)
         return self.get_instance_metadata(index)
         
-    def get_previous_instance(self, timestamp : float) -> BaseDataModel:
+    def get_previous_instance(self, timestamp : float) -> BaseModel:
         """Get the instance immediately before the specified timestamp.
 
         Parameters
@@ -187,7 +187,7 @@ class DataStream(BaseModel):
 
         Returns
         -------
-        BaseDataModel
+        BaseModel
             The snapshot immediately before the specified timestamp.
 
         Notes
@@ -199,7 +199,7 @@ class DataStream(BaseModel):
         return self.make_instance(self.get_previous_instance_metadata(timestamp))
 
 
-    def get_next_instance(self, timestamp : float) -> BaseDataModel:
+    def get_next_instance(self, timestamp : float) -> BaseModel:
         """Get the instance immediately after the specified timestamp.
 
         Parameters
@@ -209,7 +209,7 @@ class DataStream(BaseModel):
 
         Returns
         -------
-        BaseDataModel
+        BaseModel
             The snapshot immediately after the specified timestamp.
 
         Notes

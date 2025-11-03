@@ -1,5 +1,5 @@
 
-from ..core import DataStream
+from ..core.data_stream import DataStream
 from data_models.core.base_model import BaseModel
 from data_models.core.base_metadata import BaseMetadata
 from ros_python_conversions.ros2.time import time_to_timestamp
@@ -10,8 +10,12 @@ from rosbags.typesys.store import Typestore
 from rclpy.time import Time
 
 from typing import Callable, Optional, Any, List, Tuple
+from pydantic import Field
 
 class Ros2DataStream(DataStream):
+
+    class Config:
+        arbitrary_types_allowed = True
 
     ros2_mcap_path : str
     loaded_ros2_mcap_reader : Optional[Reader]
@@ -19,11 +23,12 @@ class Ros2DataStream(DataStream):
     topic : str
     interpolable : bool
     use_header_timestamps : bool
-    _timestamps : Optional[List[float]] = None
-    _raw_timestamps : Optional[List[float]] = None
+    timestamps_ : Optional[List[float]] = None
+    raw_timestamps_ : Optional[List[float]] = None
     connection : Optional[Any] = None
     connections : Optional[List[Any]] = None
-    typestore : Optional[Typestore] = None
+    typestore : Optional[Typestore]
+
 
     def __init__(__pydantic_self__, **data):
 
@@ -43,16 +48,10 @@ class Ros2DataStream(DataStream):
             return
 
         self.typestore = get_typestore(Stores.LATEST)
-        self.typestore.register(
-            get_types_from_msg(
-                self.connection.msgdef, 
-                self.connection.msgtype
-            )
-        )
 
-
-        #self._timestamps = self.get_timestamps()
-
+        types = get_types_from_msg(self.connection.msgdef.data, self.connection.msgtype)
+        self.typestore.register(types)
+        
     def make_instance(self, instance_metadata : BaseMetadata) -> BaseModel:
 
         topic, msg, time = self.get_message(instance_metadata)
@@ -65,10 +64,10 @@ class Ros2DataStream(DataStream):
     
     @property
     def timestamps(self) -> List[float]:
-        if not self._timestamps:
-            self._timestamps, self._raw_timestamps = self.get_timestamps()
+        if not self.timestamps_:
+            self.timestamps_, self.raw_timestamps_ = self.get_timestamps()
 
-        return self._timestamps
+        return self.timestamps_
 
     def get_timestamps(self) -> Tuple[List[float], List[float]]:
 
@@ -106,7 +105,7 @@ class Ros2DataStream(DataStream):
     def get_message(self, instance_metadata : BaseMetadata) -> Tuple[str, Any, Time]:
 
         # Create initial time by sampling from raw timestamps, then shifting down by small amount
-        start_time = self._raw_timestamps[instance_metadata.index] - 1e-6
+        start_time = self.raw_timestamps_[instance_metadata.index] - 1e-6
 
         # Convert to nanoseconds
         timestamp_ns = int(start_time * 1e9)
@@ -123,7 +122,6 @@ class Ros2DataStream(DataStream):
         return conn, message, ts
 
 def make_ros2_data_stream(ros2_mcap_path : str,
-                               loaded_mcap : Optional[Reader],
                                topic : str,
                                decode_fn : Callable[[Any, int, float], BaseModel],
                                interpolable : bool,
@@ -131,7 +129,7 @@ def make_ros2_data_stream(ros2_mcap_path : str,
     
     return Ros2DataStream(
         ros2_mcap_path=ros2_mcap_path,
-        loaded_ros2_mcap_reader=loaded_mcap,
+        loaded_ros2_mcap_reader=None,
         decode_fn=decode_fn,
         topic=topic,
         interpolable=interpolable,
