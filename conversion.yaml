@@ -1,6 +1,0 @@
-output_bags:
-  - uri: rgbd_dataset_ros2
-    storage_id: "mcap"
-    # Optional: You can add compression here
-    # compression_mode: "file"
-    # compression_format: "zstd"
