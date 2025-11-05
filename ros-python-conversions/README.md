@@ -10,7 +10,7 @@ A good design pattern is to maintain a conversion layer between ros messages and
 
 For chronological data, we always want a timestamp and index, which is the bare minimum a python object for a given message type will hold.
 
-### Implementing New Conversions
+## Implementing New Conversions
 
 To implement a new conversion follow this process:
 
