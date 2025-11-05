@@ -2,6 +2,12 @@
 name = "data-streams"
 version = "0.1.0"
 requires-python = ">=3.9"
+dependencies = [
+    "data-models",
+    "pydantic>=1.10.0,<2.0.0",
+    "numpy>=1.21.0",
+    "rosbags>=0.9.0",
+]
 
 [tool.setuptools.packages.find]
 where = ["src"]
