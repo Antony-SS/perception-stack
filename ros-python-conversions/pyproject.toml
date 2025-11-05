@@ -5,6 +5,7 @@ requires-python = ">=3.9"
 dependencies = [
     "data-models",
     "rosidl-runtime-py",
+    "scipy>=1.7.0",
 ]
 
 [tool.setuptools.packages.find]
