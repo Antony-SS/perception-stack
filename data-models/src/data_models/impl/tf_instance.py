@@ -1,4 +1,4 @@
-from data_models.core.base_model import BaseModel
+from data_models.core.base_model import BaseInstance
 from data_models.core.base_metadata import BaseMetadata
 
 import numpy as np
@@ -7,7 +7,7 @@ from typing import Dict, Optional
 from data_models.impl.transforms import Transform3D
 
 
-class TFInstance(BaseModel):
+class TFInstance(BaseInstance):
     """Data model for a single TF transform instance.
     
     Attributes

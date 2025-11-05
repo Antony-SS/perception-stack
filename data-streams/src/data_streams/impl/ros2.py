@@ -1,6 +1,6 @@
 
 from ..core.data_stream import DataStream
-from data_models.core.base_model import BaseModel
+from data_models.core.base_model import BaseInstance
 from data_models.core.base_metadata import BaseMetadata
 from ros_python_conversions.ros2.time import time_to_timestamp
 
@@ -10,7 +10,6 @@ from rosbags.typesys.store import Typestore
 from rclpy.time import Time
 
 from typing import Callable, Optional, Any, List, Tuple
-from pydantic import Field
 
 class Ros2DataStream(DataStream):
 
@@ -19,7 +18,7 @@ class Ros2DataStream(DataStream):
 
     ros2_mcap_path : str
     loaded_ros2_mcap_reader : Optional[Reader]
-    decode_fn : Callable[[Any, int, float], BaseModel]
+    decode_fn : Callable[[Any, int, float], BaseInstance]
     topic : str
     interpolable : bool
     use_header_timestamps : bool
@@ -52,7 +51,7 @@ class Ros2DataStream(DataStream):
         types = get_types_from_msg(self.connection.msgdef.data, self.connection.msgtype)
         self.typestore.register(types)
         
-    def make_instance(self, instance_metadata : BaseMetadata) -> BaseModel:
+    def make_instance(self, instance_metadata : BaseMetadata) -> BaseInstance:
 
         topic, msg, time = self.get_message(instance_metadata)
 
@@ -123,7 +122,7 @@ class Ros2DataStream(DataStream):
 
 def make_ros2_data_stream(ros2_mcap_path : str,
                                topic : str,
-                               decode_fn : Callable[[Any, int, float], BaseModel],
+                               decode_fn : Callable[[Any, int, float], BaseInstance],
                                interpolable : bool,
                                use_header_timestamps : bool) -> Ros2DataStream:
     

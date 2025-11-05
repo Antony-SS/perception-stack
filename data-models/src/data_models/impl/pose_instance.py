@@ -1,8 +1,8 @@
-from data_models.core.base_model import BaseModel
+from data_models.core.base_model import BaseInstance
 from data_models.core.base_metadata import BaseMetadata
 from data_models.impl.transforms import Transform3D
 
-class PoseInstance(BaseModel):
+class PoseInstance(BaseInstance):
     """Data model for a single pose instance from odometry.
     
     Attributes

@@ -1,9 +1,9 @@
-from data_models.core.base_model import BaseModel
+from data_models.core.base_model import BaseInstance
 from data_models.core.base_metadata import BaseMetadata
 
 import numpy as np
 
-class ImageInstance(BaseModel):
+class ImageInstance(BaseInstance):
     
     data : np.ndarray
     metadata : BaseMetadata

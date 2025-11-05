@@ -1,5 +1,5 @@
-from data_models.core.base_model import BaseModel
 from data_models.core.base_metadata import BaseMetadata
+from data_models.core.base_model import BaseInstance
 
 from pydantic import BaseModel, ConfigDict
 import numpy as np
@@ -38,7 +38,7 @@ class DataStream(BaseModel):
 
         return self.end_time - self.start_time
 
-    def iterate(self) -> Generator[BaseModel, None, None]:
+    def iterate(self) -> Generator[BaseInstance, None, None]:
         """Iterate through instances in the data stream.
 
         This method yields instances from the data stream sequentially.
@@ -57,8 +57,8 @@ class DataStream(BaseModel):
             range(len(self))
         )
     
-    def get_instance(self, index : int) -> BaseModel:
-        """Get a BaseModel from the data stream at the specified index.
+    def get_instance(self, index : int) -> BaseInstance:
+        """Get a BaseInstance from the data stream at the specified index.
 
         Parameters
         ----------
@@ -67,7 +67,7 @@ class DataStream(BaseModel):
 
         Returns
         -------
-        BaseModel
+        BaseInstance
             The instance at the specified index.
 
         Notes
@@ -177,7 +177,7 @@ class DataStream(BaseModel):
         index = self._find_nearest_timestamp_index(timestamp)
         return self.get_instance_metadata(index)
         
-    def get_previous_instance(self, timestamp : float) -> BaseModel:
+    def get_previous_instance(self, timestamp : float) -> BaseInstance:
         """Get the instance immediately before the specified timestamp.
 
         Parameters
@@ -187,7 +187,7 @@ class DataStream(BaseModel):
 
         Returns
         -------
-        BaseModel
+        BaseInstance
             The snapshot immediately before the specified timestamp.
 
         Notes
@@ -199,7 +199,7 @@ class DataStream(BaseModel):
         return self.make_instance(self.get_previous_instance_metadata(timestamp))
 
 
-    def get_next_instance(self, timestamp : float) -> BaseModel:
+    def get_next_instance(self, timestamp : float) -> BaseInstance:
         """Get the instance immediately after the specified timestamp.
 
         Parameters
@@ -209,7 +209,7 @@ class DataStream(BaseModel):
 
         Returns
         -------
-        BaseModel
+        BaseInstance
             The snapshot immediately after the specified timestamp.
 
         Notes
@@ -220,7 +220,7 @@ class DataStream(BaseModel):
         """
         return self.make_instance(self.get_next_instance_metadata(timestamp))
     
-    def get_nearest_instance(self, timestamp : float) -> BaseModel:
+    def get_nearest_instance(self, timestamp : float) -> BaseInstance:
         """Get the snapshot closest in time to the specified timestamp.
 
         Parameters
@@ -230,7 +230,7 @@ class DataStream(BaseModel):
 
         Returns
         -------
-        BaseModel
+        BaseInstance
             The instance closest in time to the specified timestamp.
 
         Notes
@@ -241,7 +241,7 @@ class DataStream(BaseModel):
         """
         return self.make_instance(self.get_nearest_instance_metadata(timestamp))
 
-    def make_instance(self, instance_metadata : BaseMetadata) -> BaseModel:
+    def make_instance(self, instance_metadata : BaseMetadata) -> BaseInstance:
         """Function for creating a instance. Must be implemented in subclasses.
 
         Args:
@@ -252,7 +252,7 @@ class DataStream(BaseModel):
             NotImplementedError: Override this implementation in subclasses
 
         Returns:
-            BaseModel: A instance containing relevant data, must be subclass of BaseModel
+            BaseInstance: A instance containing relevant data, must be subclass of BaseInstance
         """
         raise NotImplementedError
 

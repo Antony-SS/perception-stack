@@ -10,6 +10,6 @@ class Transform3D(BaseModel):
     class Config:
         arbitrary_types_allowed = True
 
-    def euler_flu_degrees(self) -> np.ndarray: #TODO: Add support for other conventions
+    def euler_flu_degrees(self) -> np.ndarray:
         return self.rotation.as_euler('xyz', degrees=True)
 
