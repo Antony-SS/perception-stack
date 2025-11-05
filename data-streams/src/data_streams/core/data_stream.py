@@ -38,14 +38,14 @@ class DataStream(BaseModel):
 
         return self.end_time - self.start_time
 
-    def iterate(self) -> Generator[BaseInstance, None, None]:
+    def iterate(self, skip_every: int = 1) -> Generator[BaseInstance, None, None]:
         """Iterate through instances in the data stream.
 
         This method yields instances from the data stream sequentially.
 
         Yields
         -------
-        BaseModel
+        BaseInstance
             Sequential instances from the data stream.
 
         Notes
@@ -54,7 +54,7 @@ class DataStream(BaseModel):
         """
         return map(
             self.get_instance,
-            range(len(self))
+            range(0, len(self), skip_every)
         )
     
     def get_instance(self, index : int) -> BaseInstance:
@@ -252,7 +252,7 @@ class DataStream(BaseModel):
             NotImplementedError: Override this implementation in subclasses
 
         Returns:
-            BaseInstance: A instance containing relevant data, must be subclass of BaseInstance
+            BaseModel: A instance containing relevant data, must be subclass of BaseModel
         """
         raise NotImplementedError
 
