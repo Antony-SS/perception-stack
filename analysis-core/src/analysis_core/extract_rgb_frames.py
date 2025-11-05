@@ -22,7 +22,7 @@ def extract_rgb_frames(bag_path : str, image_topic_name : str, output_dir : str,
         raise ValueError(f"No images found in bag {bag_path} and topic {image_topic_name}")
         return
 
-    print(data_stream.timestamps)
+    print("Found %d images in bag %s and topic %s" % (len(data_stream), bag_path, image_topic_name))
 
     for index, image_instance in tqdm(enumerate(data_stream.iterate()), total=len(data_stream)):
         image = image_instance.data
