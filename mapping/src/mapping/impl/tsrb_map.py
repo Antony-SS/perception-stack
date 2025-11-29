@@ -3,7 +3,6 @@ from geometry.gridmap import DenseGridLayer, GridmapCoordinates
 import numpy as np
 from typing import Optional, List
 
-
 class TSRBMap(Map):
 
     class Config:
@@ -11,9 +10,13 @@ class TSRBMap(Map):
 
     dense_layer: DenseGridLayer
 
-    def __init__(self, name: str, bounds: np.ndarray, padding: float = 1.0, resolution: float = 0.1, odometry_data: Optional[List[np.ndarray]] = None):
-        super().__init__(name, bounds, padding, resolution)
-        self.dense_layer = DenseGridLayer(name, self.gridmap_coords)
+    def __init__(self, bounds: np.ndarray, padding: float = 1.0, resolution: float = 0.1, odometry_data: Optional[List[np.ndarray]] = None):
+        name = "tsrb_map"
+        super().__init__("tsrb_map", bounds, padding, resolution, odometry_data)
+        if padding is not None:
+            bounds = bounds + padding * np.array([-1, -1, 1, 1])
+
+        self.dense_layer = DenseGridLayer(name, GridmapCoordinates(bounds, resolution))
         self.odometry_data = odometry_data if odometry_data is not None else []
 
     def visualize(self, binary: bool = False, exponential_scaling: bool = True, visualize_origin: bool = True, visualize_odometry: bool = True):
