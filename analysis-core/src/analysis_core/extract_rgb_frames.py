@@ -1,13 +1,14 @@
 
 from data_streams.ros2_common.camera_streams import make_rgb_image_stream
 from data_streams.ros2_common.pose_streams import make_odometry_stream
+from data_streams.collection_streams.research_robot import make_tf_static_to_pose_stream
 
 import os
 import cv2
 from tqdm import tqdm
 from datetime import datetime
 
-def extract_rgb_frames(bag_path : str, image_topic_name : str, output_dir : str, overlay_timestamps : bool = True, overlay_pose : bool = True, pose_topic_name : str = "/pose", use_header_timestamps : bool = True) -> None:
+def extract_rgb_frames(bag_path : str, image_topic_name : str, output_dir : str, overlay_timestamps : bool = True, overlay_pose : bool = True, pose_topic_name : str = "/pose", skip_every : int = 1, use_header_timestamps : bool = True) -> None:
 
     image_stream = make_rgb_image_stream(ros2_mcap_path=bag_path, topic_name=image_topic_name, use_header_timestamps=use_header_timestamps)
     pose_stream = None
@@ -25,8 +26,8 @@ def extract_rgb_frames(bag_path : str, image_topic_name : str, output_dir : str,
         if len(pose_stream) == 0:
             raise ValueError(f"No poses found in bag {bag_path} and topic {pose_topic_name} to overlay on images")
 
-
-    for index, image_instance in tqdm(enumerate(image_stream.iterate()), total=len(image_stream)):
+    length = len(image_stream) // skip_every
+    for index, image_instance in tqdm(enumerate(image_stream.iterate(skip_every=skip_every)), total=length):
         image = image_instance.data
         index = image_instance.index
         timestamp = image_instance.timestamp

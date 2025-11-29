@@ -10,6 +10,7 @@ def parse_args():
     parser.add_argument("--overlay_timestamps", action="store_true", required=False)
     parser.add_argument("--overlay_pose", action="store_true", required=False)
     parser.add_argument("--pose_topic", type=str, required=False, default="/pose")
+    parser.add_argument("--skip_every", type=int, required=False, default=1)
     parser.add_argument("--use_header_timestamps", type=bool, required=False, default=True)
     return parser.parse_args()
 
@@ -31,6 +32,7 @@ def main():
         args.overlay_timestamps,
         args.overlay_pose,
         args.pose_topic,
+        args.skip_every,
         args.use_header_timestamps
     )
 

@@ -53,6 +53,7 @@ def tf_message_to_tf_instance(msg: Any, instance_index: int = -1, timestamp: Uni
     
     # Convert each TransformStamped to TransformData
     for transform_stamped in msg.transforms:
+        parent_frame_id = transform_stamped.header.frame_id
         child_frame_id = transform_stamped.child_frame_id
         
         # Extract translation
@@ -72,7 +73,7 @@ def tf_message_to_tf_instance(msg: Any, instance_index: int = -1, timestamp: Uni
         ]
         rotation = Rotation.from_quat(quaternion)
         
-        transforms[child_frame_id] = Transform3D(
+        transforms[parent_frame_id + "->" + child_frame_id] = Transform3D(
             translation=translation,
             rotation=rotation
         )
