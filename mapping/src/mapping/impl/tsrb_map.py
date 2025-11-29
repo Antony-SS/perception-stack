@@ -11,13 +11,20 @@ class TSRBMap(Map):
     dense_layer: DenseGridLayer
 
     def __init__(self, bounds: np.ndarray, padding: float = 1.0, resolution: float = 0.1, odometry_data: Optional[List[np.ndarray]] = None):
-        name = "tsrb_map"
-        super().__init__("tsrb_map", bounds, padding, resolution, odometry_data)
         if padding is not None:
             bounds = bounds + padding * np.array([-1, -1, 1, 1])
-
-        self.dense_layer = DenseGridLayer(name, GridmapCoordinates(bounds, resolution))
-        self.odometry_data = odometry_data if odometry_data is not None else []
+        
+        name = "tsrb_map"
+        dense_layer = DenseGridLayer(name, GridmapCoordinates(bounds, resolution))
+        
+        super().__init__(
+            name=name,
+            bounds=bounds,
+            padding=padding,
+            resolution=resolution,
+            odometry_data=odometry_data if odometry_data is not None else [],
+            dense_layer=dense_layer
+        )
 
     def visualize(self, binary: bool = False, exponential_scaling: bool = True, visualize_origin: bool = True, visualize_odometry: bool = True):
         visualization = self.dense_layer.visualize(binary=binary, exponential_scaling=exponential_scaling)

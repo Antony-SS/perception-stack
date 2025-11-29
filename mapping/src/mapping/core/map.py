@@ -14,10 +14,11 @@ class Map(BaseModel):
     odometry_data: Optional[List[np.ndarray]] = None
 
     def __init__(self, name: str, bounds: np.ndarray, padding: float = 1.0, resolution: float = 0.1, odometry_data: Optional[List[np.ndarray]] = None):
-
-        self.name = name
-        self.gridmap_coords = GridmapCoordinates(bounds, resolution)
-        self.odometry_data = odometry_data if odometry_data is not None else []
+        super().__init__(
+            name=name,
+            gridmap_coords=GridmapCoordinates(bounds, resolution),
+            odometry_data=odometry_data if odometry_data is not None else []
+        )
 
     def visualize(self, **args):
         raise NotImplementedError("Visualization of maps is not implemented yet")
