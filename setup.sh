@@ -22,5 +22,8 @@ pip install -e ./data-models
 pip install -e ./data-streams
 pip install -e ./ros-python-conversions
 pip install -e ./analysis-core
+pip install -e ./mapping
+pip install -e ./geometry
+pip install -e ./visualization
 
 echo "Installation complete!"
