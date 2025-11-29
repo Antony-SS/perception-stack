@@ -22,11 +22,21 @@ class GridmapCoordinates(BaseModel):
     y_coords: Optional[np.ndarray] = None # coordinates of the bin centers in the y direction
 
     def __init__(self, gridmap_bounds: np.ndarray, grid_resolution: float):
-        self._gridmap_shape = np.floor((gridmap_bounds[2:] - gridmap_bounds[:2]) / grid_resolution).astype(int)
-        self.left_x_edges = np.flip(np.linspace(gridmap_bounds[0], gridmap_bounds[2], self._gridmap_shape[0] + 1))
-        self.left_y_edges = np.flip(np.linspace(gridmap_bounds[1], gridmap_bounds[3], self._gridmap_shape[1] + 1))
-        self.x_coords = (self.left_x_edges[:-1] + self.left_x_edges[1:]) / 2
-        self.y_coords = (self.left_y_edges[:-1] + self.left_y_edges[1:]) / 2
+        gridmap_shape = np.floor((gridmap_bounds[2:] - gridmap_bounds[:2]) / grid_resolution).astype(int)
+        left_x_edges = np.flip(np.linspace(gridmap_bounds[0], gridmap_bounds[2], gridmap_shape[0] + 1))
+        left_y_edges = np.flip(np.linspace(gridmap_bounds[1], gridmap_bounds[3], gridmap_shape[1] + 1))
+        x_coords = (left_x_edges[:-1] + left_x_edges[1:]) / 2
+        y_coords = (left_y_edges[:-1] + left_y_edges[1:]) / 2
+        
+        super().__init__(
+            gridmap_bounds=gridmap_bounds,
+            grid_resolution=grid_resolution,
+            gridmap_shape=gridmap_shape,
+            left_x_edges=left_x_edges,
+            left_y_edges=left_y_edges,
+            x_coords=x_coords,
+            y_coords=y_coords
+        )
 
 
     def xy_to_uv(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
@@ -35,12 +45,12 @@ class GridmapCoordinates(BaseModel):
 
         """
         if len(x) == 1 and len(y) == 1:
-            x_idx = self._gridmap_shape[0] - 1 - np.floor((x[0] - self.gridmap_bounds[0]) / self.grid_resolution).astype(int)
-            y_idx = self._gridmap_shape[1] - 1 - np.floor((y[0] - self.gridmap_bounds[1]) / self.grid_resolution).astype(int)
+            x_idx = self.gridmap_shape[0] - 1 - np.floor((x[0] - self.gridmap_bounds[0]) / self.grid_resolution).astype(int)
+            y_idx = self.gridmap_shape[1] - 1 - np.floor((y[0] - self.gridmap_bounds[1]) / self.grid_resolution).astype(int)
             return np.array([x_idx, y_idx])
         elif len(x) == len(y):
-            x_idx = self._gridmap_shape[0] - 1 - np.floor((x - self.gridmap_bounds[0]) / self.grid_resolution).astype(int)
-            y_idx = self._gridmap_shape[1] - 1 - np.floor((y - self.gridmap_bounds[1]) / self.grid_resolution).astype(int)
+            x_idx = self.gridmap_shape[0] - 1 - np.floor((x - self.gridmap_bounds[0]) / self.grid_resolution).astype(int)
+            y_idx = self.gridmap_shape[1] - 1 - np.floor((y - self.gridmap_bounds[1]) / self.grid_resolution).astype(int)
             return np.concatenate((x_idx.reshape(-1, 1), y_idx.reshape(-1, 1)), axis=1)
         else:
             raise ValueError("x and y must have the same length")
@@ -63,9 +73,14 @@ class DenseGridLayer(BaseModel):
 
 
     def __init__(self, name: str, gridmap_coordinates: GridmapCoordinates):
-        self.name = name
-        self.gridmap_coordinates = gridmap_coordinates
-        self.occupancy_data = np.zeros(self.shape)
+        shape = gridmap_coordinates.gridmap_shape
+        occupancy_data = np.zeros(shape)
+        
+        super().__init__(
+            name=name,
+            gridmap_coordinates=gridmap_coordinates,
+            occupancy_data=occupancy_data
+        )
 
     @property
     def shape(self) -> np.ndarray:
@@ -104,9 +119,14 @@ class SparseGridLayer(BaseModel):
     
 
     def __init__(self, name: str, gridmap_coordinates: GridmapCoordinates):
-        self.name = name
-        self.gridmap_coordinates = gridmap_coordinates
-        self.occupancy_data = np.zeros(self.shape)
+        shape = gridmap_coordinates.gridmap_shape
+        occupancy_data = np.zeros(shape)
+        
+        super().__init__(
+            name=name,
+            gridmap_coordinates=gridmap_coordinates,
+            occupancy_data=occupancy_data
+        )
 
 class Gridmap(BaseModel):
     class Config:
