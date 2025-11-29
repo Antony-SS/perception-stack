@@ -133,4 +133,9 @@ class Gridmap(BaseModel):
     def get_layer_count(self) -> int:
         return len(self.layer_names) if self.layers is not None else 0
 
+    def get_dense_layers(self) -> List[DenseGridLayer]:
+        return [layer for layer in self.layers.values() if isinstance(layer, DenseGridLayer)]
+
+    def get_sparse_layers(self) -> List[SparseGridLayer]:
+        return [layer for layer in self.layers.values() if isinstance(layer, SparseGridLayer)]
 
