@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from typing import Optional
 import numpy as np
+from typing import Dict, List, Union
 
 class GridmapCoordinates(BaseModel):
     """
@@ -53,12 +54,16 @@ class GridmapCoordinates(BaseModel):
             raise ValueError("u and v must have the same length")
 
 class DenseGridLayer(BaseModel):
+    class Config:
+        arbitrary_types_allowed = True
 
+    name: str = "dense_grid_layer"
     gridmap_coordinates: GridmapCoordinates
     occupancy_data: np.ndarray = None
 
 
-    def __init__(self, gridmap_coordinates: GridmapCoordinates):
+    def __init__(self, name: str, gridmap_coordinates: GridmapCoordinates):
+        self.name = name
         self.gridmap_coordinates = gridmap_coordinates
         self.occupancy_data = np.zeros(self.shape)
 
@@ -85,5 +90,47 @@ class DenseGridLayer(BaseModel):
         histogram = np.fliplr(np.flipud(histogram))
         self.occupancy_data += histogram
 
+class SparseGridLayer(BaseModel):
+
+    """ Sparse grid layer for a gridmap.  Only stores geometric objects like circles, boxes, lines, etc. at coordinate locations.
+    Doesn't maintain occupancy data, but can visualize the objects on the gridmap.
+    """
+
+    class Config:
+        arbitrary_types_allowed = True
+
+    name: str = "sparse_grid_layer"
+    gridmap_coordinates: GridmapCoordinates
+    
+
+    def __init__(self, name: str, gridmap_coordinates: GridmapCoordinates):
+        self.name = name
+        self.gridmap_coordinates = gridmap_coordinates
+        self.occupancy_data = np.zeros(self.shape)
+
+class Gridmap(BaseModel):
+    class Config:
+        arbitrary_types_allowed = True
+
+    gridmap_coordinates: GridmapCoordinates
+    layers: Optional[Dict[str, Union[DenseGridLayer, SparseGridLayer]]] = None
+
+    def add_layer(self, layer: Union[DenseGridLayer, SparseGridLayer]):
+        if self.layers is None:
+            self.layers = {}
+        self.layers[layer.name] = layer
+
+    def get_layer_by_name(self, name: str) -> Union[DenseGridLayer, SparseGridLayer]:
+        return self.layers[name] if self.layers is not None else None
+
+    def get_layer_by_index(self, index: int) -> Union[DenseGridLayer, SparseGridLayer]:
+        return self.layers[self.layer_names[index]] if self.layers is not None else None
+
+    @property
+    def layer_names(self) -> List[str]:
+        return list(self.layers.keys()) if self.layers is not None else []
+
+    def get_layer_count(self) -> int:
+        return len(self.layer_names) if self.layers is not None else 0
 
 
