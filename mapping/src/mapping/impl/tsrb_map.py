@@ -1,4 +1,4 @@
-from mapping.src.core.map import Map
+from mapping.core.map import Map
 from geometry.gridmap import DenseGridLayer, GridmapCoordinates
 import numpy as np
 from typing import Optional, List
