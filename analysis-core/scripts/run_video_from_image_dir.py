@@ -33,7 +33,10 @@ def video_from_image_dir(image_dir : str, output_video_path : str, fps : int = 3
         pattern = os.path.join(image_dir, f"%06d.{image_file_type}")
         print(f"Creating video from {pattern} to {output_video_path} at {fps} fps")
         try:
-            ffmpeg.input(pattern).output(output_video_path, vf=f"fps={fps}", pix_fmt="yuv420p").run()
+            ffmpeg.input(pattern,framerate=fps).output(
+                output_video_path, 
+                vf=f"scale=trunc(iw/2)*2:trunc(ih/2)*2,fps={fps}", 
+                pix_fmt="yuv420p").run()
         except Exception as e:
             raise ValueError(f"Failed to create video: {e}")
     else:
@@ -52,15 +55,14 @@ def video_from_image_dir(image_dir : str, output_video_path : str, fps : int = 3
             with open(concat_file, 'w') as f:
                 for image_file in image_files:
                     f.write(f"file '{os.path.abspath(image_file)}'\n")
-                    f.write(f"duration 1\n")
-                # Repeat last frame to ensure proper duration
-                f.write(f"file '{os.path.abspath(image_files[-1])}'\n")
             
             # Use concat demuxer with fps filter
             try:
-                ffmpeg.input(concat_file, format='concat', safe=0).output(
+                f.write(f"duration {1.0/fps}\n")
+                ffmpeg.input(concat_file, format='concat', safe=0, framerate=fps).output(
                     output_video_path, 
-                    vf=f"fps={fps}", 
+                    vf=f"scale=trunc(iw/2)*2:trunc(ih/2)*2",
+                    r=fps,
                     pix_fmt="yuv420p"
                 ).run(overwrite_output=True)
             except Exception as e:

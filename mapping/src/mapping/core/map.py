@@ -13,7 +13,15 @@ class Map(BaseModel):
 
     odometry_data: Optional[List[np.ndarray]] = None
 
-    def __init__(self, name: str, bounds: np.ndarray, padding: float = 1.0, resolution: float = 0.1, odometry_data: Optional[List[np.ndarray]] = None):
+    def __init__(self, name: str, bounds: np.ndarray, padding_x = 1.0, padding_y = 1.0, resolution: float = 0.1, odometry_data: Optional[List[np.ndarray]] = None):
+
+        if padding_x is not None:
+            bounds[0] -= padding_x
+            bounds[2] += padding_x
+        if padding_y is not None:
+            bounds[1] -= padding_y
+            bounds[3] += padding_y
+
         super().__init__(
             name=name,
             gridmap_coords=GridmapCoordinates(bounds, resolution),
