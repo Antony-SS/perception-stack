@@ -5,7 +5,7 @@ _Many of the design philosophies in this repository are inspired by my first bos
 
 ## Design Philosphy
 
-Everything in this repo is built around the `DataStream` and `BaseInstance` classes.  Without getting too philosophical, all times series data is made up of a series of instances with a timestamp and index, where each instance is associated with piece of data, like an image.  
+Everything in this repo is built around the `DataStream` and `BaseInstance` classes.  All times series data is made up of a series of instances with a timestamp and index, where each instance is associated with piece of data, like an image.  
 
 The `DataStream` class provides a structured framework for iterating through, and accessing these instances.  Implementing a subclass of a `DataStream` is as simple as defining the `timestamps` and `make_instance` functions!
 
