@@ -1,5 +1,14 @@
 # perception-stack
-A toolbox for offline analysis of timestamped sensor data with a focus on robotics and vision applications.
+A lightweight toolbox for offline analysis of time series sensor data with a focus on robotics and vision applications.  Built around ros2 and leans on numpy, scipy, and cv2.
+
+# Design Philosphy
+
+Everything in this repo is built around the `DataStream` and `BaseInstance` classes.  Without getting too philosophical, all times series data is made up of a series of __instances__ with a timestamp and index, where each instance is associated with piece of data, like an image.  
+
+The `DataStream` class provides a structured framework for iterating through, and accessing these instances.  Implementing a subclass of a `DataStream` is as simple as defining the `timestamps` and `make_instance` functions!
+
+### Ros <-> Python 
+When working from ros2 bags, I define a conversion layer between ros messages and the `BaseInstance` data structure because I prefer to work with simple python datastructures.  See `ros-python-conversions` for examples.  It makes code much more readable.  All credit to Michael, my first boss, who introduced me to this design philosophy.
 
 ## Prerequisites
 
