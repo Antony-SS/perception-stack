@@ -32,11 +32,9 @@ def visualize_stacked_sparse_layers(Gridmap: Gridmap):
 def visualize_dense_grid_layer(dense_grid_layer: DenseGridLayer, binary: bool = False, exponential_scaling: bool = False):
 
     if binary:
-        occupancy_data = dense_grid_layer.occupancy_data > 0
+        occupancy_data = (dense_grid_layer.occupancy_data > 0).astype(np.uint8)
     else:
         occupancy_data = dense_grid_layer.occupancy_data
-
-    occupancy_data = occupancy_data.astype(np.uint8)
 
     if exponential_scaling:
         occupancy_data = np.exp(occupancy_data)
@@ -44,6 +42,8 @@ def visualize_dense_grid_layer(dense_grid_layer: DenseGridLayer, binary: bool = 
         occupancy_data = occupancy_data
 
     occupancy_data = (occupancy_data - occupancy_data.min()) / (occupancy_data.max() - occupancy_data.min())
+    occupancy_data = (occupancy_data * 255.0).astype(np.uint8)
+
     occupancy_vis = cv2.applyColorMap(occupancy_data, cv2.COLORMAP_JET)
 
     return occupancy_vis

@@ -2,6 +2,8 @@ from mapping.core.map import Map
 from geometry.gridmap import DenseGridLayer, GridmapCoordinates
 import numpy as np
 from typing import Optional, List
+from pydantic import BaseModel
+from visualization.gridmap_vis import visualize_dense_grid_layer
 
 class TSRBMap(Map):
 
@@ -17,19 +19,19 @@ class TSRBMap(Map):
         name = "tsrb_map"
         dense_layer = DenseGridLayer(name, GridmapCoordinates(bounds, resolution))
         
-        super().__init__(
+        # Call BaseModel.__init__ directly with all fields (bypassing Map.__init__)
+        BaseModel.__init__(
+            self,
             name=name,
-            bounds=bounds,
-            padding=padding,
-            resolution=resolution,
+            gridmap_coords=GridmapCoordinates(bounds, resolution),
             odometry_data=odometry_data if odometry_data is not None else [],
             dense_layer=dense_layer
         )
 
     def visualize(self, binary: bool = False, exponential_scaling: bool = True, visualize_origin: bool = True, visualize_odometry: bool = True):
-        visualization = self.dense_layer.visualize(binary=binary, exponential_scaling=exponential_scaling)
+        visualization = visualize_dense_grid_layer(self.dense_layer, binary=binary, exponential_scaling=exponential_scaling)
         if visualize_origin:
-            visualization = self.draw_origin_axes(visualization)
+            visualization = self.draw_origin_axes(visualization, size=2.0)
         if visualize_odometry and self.odometry_data and len(self.odometry_data) > 0:
-            visualization = self.draw_odometry_data(visualization)
+            visualization = self.draw_odometry_data(visualization, axis_size=1.0)
         return visualization

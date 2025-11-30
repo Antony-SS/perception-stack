@@ -96,7 +96,10 @@ class DenseGridLayer(BaseModel):
 
     def uv_to_xy(self, u: np.ndarray, v: np.ndarray) -> np.ndarray:
         return self.gridmap_coordinates.uv_to_xy(u, v)
-
+    
+    def xy_to_uv(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
+        return self.gridmap_coordinates.xy_to_uv(x, y)
+    
     def add_points(self, points: np.ndarray):
         x_edges = np.linspace(self.gridmap_coordinates.gridmap_bounds[0], self.gridmap_coordinates.gridmap_bounds[2], self.shape[0] + 1)
         y_edges = np.linspace(self.gridmap_coordinates.gridmap_bounds[1], self.gridmap_coordinates.gridmap_bounds[3], self.shape[1] + 1)

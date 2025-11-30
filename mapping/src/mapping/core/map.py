@@ -17,7 +17,7 @@ class Map(BaseModel):
         super().__init__(
             name=name,
             gridmap_coords=GridmapCoordinates(bounds, resolution),
-            odometry_data=odometry_data if odometry_data is not None else []
+            odometry_data=odometry_data if odometry_data is not None else [],
         )
 
     def visualize(self, **args):
@@ -29,21 +29,25 @@ class Map(BaseModel):
 
     def draw_axes(self, input_image: np.ndarray, size: float = 1.0, start_point: np.ndarray = np.array([0, 0]), yaw: float = 0.0, ):
 
+        yaw = np.deg2rad(yaw)
+
         forward_vector = np.array([np.cos(yaw), np.sin(yaw)])
         left_vector = np.array([-np.sin(yaw), np.cos(yaw)])
 
         forward_point = start_point + forward_vector * size
         left_point = start_point + left_vector * size
 
-        forward_point_idx = self.gridmap_coords.xy_to_uv(forward_point[0], forward_point[1])
-        left_point_idx = self.gridmap_coords.xy_to_uv(left_point[0], left_point[1])
+        start_point_idx = self.gridmap_coords.xy_to_uv(np.array([start_point[0]]), np.array([start_point[1]]))
+        forward_point_idx = self.gridmap_coords.xy_to_uv(np.array([forward_point[0]]), np.array([forward_point[1]]))
+        left_point_idx = self.gridmap_coords.xy_to_uv(np.array([left_point[0]]), np.array([left_point[1]]))
 
         # flip indices for cv2 indexing
         forward_point_cv2 = (int(forward_point_idx[1]), int(forward_point_idx[0]))
         left_point_cv2 = (int(left_point_idx[1]), int(left_point_idx[0]))
+        start_point_cv2 = (int(start_point_idx[1]), int(start_point_idx[0]))
 
-        cv2.arrowedLine(input_image, forward_point_cv2, left_point_cv2, (0, 0, 255), 2)
-        cv2.arrowedLine(input_image, left_point_cv2, forward_point_cv2, (0, 255, 0), 2)
+        cv2.arrowedLine(input_image, start_point_cv2, forward_point_cv2, (0, 0, 255), 2)
+        cv2.arrowedLine(input_image, start_point_cv2, left_point_cv2, (0, 255, 0), 2)
 
         return input_image
 
@@ -56,12 +60,13 @@ class Map(BaseModel):
         all_x = np.array([pose[0] for pose in self.odometry_data])
         all_y = np.array([pose[1] for pose in self.odometry_data])
         uv_points = self.gridmap_coords.xy_to_uv(all_x, all_y)
+        uv_points = uv_points.reshape(-1, 2)
 
         # Draw lines between all consecutive odometry points
         for i in range(1, len(uv_points)):
-            pt1 = (int(uv_points[i-1, 1]), int(uv_points[i-1, 0]))  # cv2 uses (col, row)
-            pt2 = (int(uv_points[i, 1]), int(uv_points[i, 0]))
-            cv2.line(input_image, pt1, pt2, (0, 0, 255), 2)
+            pt1 = (int(uv_points[i-1][1]), int(uv_points[i-1][0]))  # cv2 uses (col, row)
+            pt2 = (int(uv_points[i][1]), int(uv_points[i][0]))
+            cv2.line(input_image, pt1, pt2, (0, 255, 255), 2)  # yellow in BGR
 
         # At the final point, draw axis representing robot pose if theta is available
         last_pose = self.odometry_data[-1]
@@ -73,7 +78,6 @@ class Map(BaseModel):
 
         return input_image
 
-    
     def add_odometry_data(self, odometry_data: List[np.ndarray]):
         if self.odometry_data is None:
             self.odometry_data = []
