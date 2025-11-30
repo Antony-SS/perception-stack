@@ -5,9 +5,9 @@ _Many of the design philosophies in this repository are inspired by my first bos
 
 ## Design Philosphy
 
-Everything in this repo is built around the `DataStream` and `BaseInstance` classes.  All times series data is made up of a series of instances with a timestamp and index, where each instance is associated with piece of data, like an image.  
+All times series data is made up of a series of instances with a timestamp and index, where each instance is associated with piece of data, like an image.  With this in mind, everything in this repo is built around the `DataStream` and `BaseInstance` classes.  
 
-The `DataStream` class provides a structured framework for iterating through, and accessing these instances.  Implementing a subclass of a `DataStream` is as simple as defining the `timestamps` and `make_instance` functions!
+The `DataStream` class provides a structured framework for chronological iteration, as well as acessing instances via timestamp/index.  Implementing a subclass of a `DataStream` is as simple as defining the `timestamps` and `make_instance` functions!
 
 #### Ros <-> Python 
 When working from ros2 bags, I define a conversion layer between ros messages and the `BaseInstance` data structure because I prefer to work with simple python datastructures.  See `ros-python-conversions` for examples.  It makes code much more readable.  All credit to my first boss, who introduced me to this design philosophy.
