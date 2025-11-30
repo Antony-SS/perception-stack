@@ -1,7 +1,7 @@
 # perception-stack
 A lightweight toolbox for offline analysis of time series sensor data with a focus on robotics and vision applications.  Built around ros2 and leans on numpy, scipy, and cv2. 
 
-_Many of the design philosophies in this repository are inspired by my first boss Michael, who taught me a lot of what I know.  Thank you._
+_Many of the design philosophies in this repository are inspired by my first boss, Michael, who taught me a lot of what I know.  Thank you._
 
 ## Design Philosphy
 
