@@ -6,6 +6,7 @@ from typing import Dict, List, Union
 class GridmapCoordinates(BaseModel):
     """
     Model for gridmap coordinates.  All gridmap classes make use of this for coordinate conversions.
+    All gridmaps are defined in the FLU frame (forward, left, up). 
     """
 
     class Config:
@@ -64,6 +65,8 @@ class GridmapCoordinates(BaseModel):
             raise ValueError("u and v must have the same length")
 
 class DenseGridLayer(BaseModel):
+    """ Dense grid layer for a gridmap.  Stores occupancy data at each grid cell. """
+    
     class Config:
         arbitrary_types_allowed = True
 
@@ -132,6 +135,9 @@ class SparseGridLayer(BaseModel):
         )
 
 class Gridmap(BaseModel):
+    """ Wrapper class for gridmaps.  Contains a dictionary of layers which can be accessed by name or index.
+    All gridmaps in a given instance will have the same gridmap coordinates (same bounds and resolution). 
+    """
     class Config:
         arbitrary_types_allowed = True
 
@@ -153,7 +159,8 @@ class Gridmap(BaseModel):
     def layer_names(self) -> List[str]:
         return list(self.layers.keys()) if self.layers is not None else []
 
-    def get_layer_count(self) -> int:
+    @property
+    def layer_count(self) -> int:
         return len(self.layer_names) if self.layers is not None else 0
 
     def get_dense_layers(self) -> List[DenseGridLayer]:
