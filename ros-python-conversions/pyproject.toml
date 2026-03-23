@@ -3,6 +3,7 @@ name = "ros-python-conversions"
 version = "0.1.0"
 requires-python = ">=3.9"
 dependencies = [
+    "av>=10.0.0",
     "data-models",
     "rosidl-runtime-py",
     "scipy>=1.7.0",
