@@ -1,31 +1,43 @@
 # perception-stack
-A lightweight toolbox for offline analysis of time series sensor data with a focus on robotics and vision applications.  Built around ros2 and leans on numpy, scipy, and cv2. 
 
-_Many of the design philosophies in this repository are inspired by my first boss, Michael, who taught me a lot of what I know.  Thank you._
+Lightweight libraries for **offline analysis of time-indexed sensor data**, with a focus on robotics and vision. The stack assumes ROS 2 bags for replay where relevant, and uses NumPy, SciPy, and OpenCV-style workflows on the Python side.
 
-## Design Philosphy
+## Packages
 
-All times series data is made up of a series of instances with a timestamp and index, where each instance is associated with piece of data, like an image.  With this in mind, everything in this repo is built around the `DataStream` and `BaseInstance` classes.  
+| Package | Role |
+|--------|------|
+| **data-models** | Shared Python types for stream instances (`BaseInstance`, `BaseMetadata`, etc.). |
+| **data-streams** | `DataStream` API: chronological access by index/timestamp; ROS 2 bag backends. |
+| **ros-python-conversions** | ROS message ↔ `data-models` instances (images, depth, TF, odometry, …). |
+| **geometry** | Grid maps, coordinate frames (FLU), and related geometric helpers. |
+| **mapping** | Map types built on `geometry` gridmaps. |
+| **visualization** | Plotting and image helpers for maps and grids. |
+| **analysis-core** | Example scripts and small tools that compose the above packages. |
 
-The `DataStream` class provides a structured framework for chronological iteration, as well as acessing instances via timestamp/index.  Implementing a subclass of a `DataStream` is as simple as defining the `timestamps` and `make_instance` functions!
+## Design pattern
 
-#### Ros <-> Python 
-When working from ros2 bags, I define a conversion layer between ros messages and the `BaseInstance` data structure because I prefer to work with simple python datastructures.  See `ros-python-conversions` for examples.  It makes code much more readable.
+1. **Streams** — All time series are modeled as ordered **instances**, each with a **timestamp** and **index**. `DataStream` subclasses implement `timestamps` and `make_instance` (and optional interpolation hooks). Callers use `get_instance`, `get_nearest_instance_metadata`, `iterate`, etc.
+
+2. **Conversion layer** — Raw ROS messages are converted to small Python objects as soon as data leaves the bag reader. That keeps downstream code independent of `rosbags` message shapes and centralizes encoding quirks (compressed RGB, depth scaling, `ffmpeg_image_transport` packets, …).
+
+See each package README for scope and how to extend it.
 
 ## Prerequisites
 
-- ROS2 (Humble, Iron, or compatible distribution) installed and sourced
+- ROS 2 (Humble, Iron, or compatible) sourced in your environment when using `cv_bridge` and message types
 - Python 3.9+
 - pip
 
 ## Installation
 
-1. Ensure ROS2 is installed and sourced:
+1. Source ROS 2, for example:
+
    ```bash
-   source /opt/ros/humble/setup.bash  # Adjust for your ROS2 distribution
+   source /opt/ros/humble/setup.bash   # adjust for your distro
    ```
 
-2. Install ROS2 Python packages (if not already installed):
+2. Install system ROS Python packages if needed, for example:
+
    ```bash
    sudo apt-get install -y \
        python3-rosidl-runtime-py \
@@ -33,14 +45,14 @@ When working from ros2 bags, I define a conversion layer between ros messages an
        ros-humble-sensor-msgs \
        ros-humble-builtin-interfaces
    ```
-   (Adjust `humble` for your ROS2 distribution)
 
-3. Run `setup.sh` script.  Remember to make it an executable!
+3. Run `./setup.sh` from this directory (ensure it is executable).
 
 ## Usage
 
-Example: Extract RGB frames from a ROS2 bag:
+Example: extract RGB frames from a bag (see `analysis-core`):
+
 ```bash
 cd analysis-core/scripts
-python3 run_extract_rgb_frames.py --bag_path <PATH_TO_BAG> --image_topic <IMAGE_TOPIC> --output_dir <OUTPUT_DIR>
+python3 run_extract_rgb_frames.py --bag_path <PATH_TO_BAG> --image_topic <TOPIC> --output_dir <OUTPUT_DIR>
 ```

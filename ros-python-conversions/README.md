@@ -1,19 +1,26 @@
 # ros-python-conversions
 
-Conversions for moving to and from ros messages/python classes (defined in data-models).  
+Conversions between **ROS 2 messages** and **Python types** in **`data-models`**.
 
 ## Motivation
 
-Very few libraries actually work on raw ros messages, so every piece of code that interacts with ros messages would require some conversion to a more useful datastructure.  That's messy.  
+Few algorithms should depend on raw ROS message objects end-to-end. A dedicated conversion layer keeps bag-reading code small and pushes quirks (encodings, transports, stamps) into one place.
 
-A good design pattern is to maintain a conversion layer between ros messages and python objects, so we convert to python objects as we read out from rosbags.
+For chronological data, each converted value should carry at least **timestamp** and **index** via `BaseMetadata` on the corresponding `BaseInstance`.
 
-For chronological data, we always want a timestamp and index, which is the bare minimum a python object for a given message type will hold.
+## Layout (examples)
 
-## Implementing New Conversions
+| Module | Purpose |
+|--------|---------|
+| `ros2/raw_rgb_image.py` | `sensor_msgs/Image`, `CompressedImage` → `ImageInstance` (BGR). |
+| `ros2/depth_image.py` | Depth `sensor_msgs/Image` → `ImageInstance` (float32 `(H, W)`; `16UC1` / `mono16` scaled mm→m). |
+| `ros2/ffmpeg_transport.py` | Detect `FFMPEGPacket`; concatenate/decode H.264/HEVC with **PyAV** (`av`), with Annex-B vs length-prefixed handling and optional **`ffmpeg`** CLI fallback. |
+| `ros2/time.py`, `tf.py`, `odometry.py` | Stamps and common nav message conversions. |
 
-To implement a new conversion follow this process:
+## Implementing new conversions
 
-1. Create a python datastructure for the ros-message you want to interface with.  For image data, this means I convert the ros message into a python object with a timestamp, index, and np.array data field
-   
-2. Define conversions in `ros_python_conversions`.  See `raw_rgb_image.py` for an example.  You should define conversions for ros message -> python and from python -> ros message
+1. Define or reuse a **`data-models`** type for the payload (fields + `BaseMetadata`).
+2. Add functions under `ros_python_conversions/ros2/`, following existing modules: **message → instance** for bag replay; add **instance → message** only if you need publishing or round-trips.
+3. For bag streams, use your decode function as the **`decode_fn`** passed into `Ros2DataStream` (see **`data-streams`** README).
+
+**Dependencies:** depth and RGB paths use **`cv_bridge`** (ROS environment). `FFMPEGPacket` decoding requires **`av`** (PyAV); system **`ffmpeg`** is optional for difficult bitstreams when width/height are known.
